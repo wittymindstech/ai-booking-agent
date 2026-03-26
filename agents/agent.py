@@ -1,53 +1,62 @@
 from google.adk.agents import LlmAgent
-#from google.adk.tools import tool
-from uuid import uuid4
+import requests
 
-# Tool
-#@tool
+# 🔧 Tool: Calls FastAPI backend
 def book_event(event_name: str, persons: int, date: str, time: str):
-    prices = {
-        "music concert": 500,
-        "tech conference": 1200
-    }
+    try:
+        payload = {
+            "event_name": event_name,
+            "persons": persons,
+            "date": date,
+            "time": time
+        }
 
-    event_name = event_name.lower()
+        response = requests.post(
+            "http://127.0.0.1:8080/book",
+            json=payload,
+            timeout=10
+        )
 
-    if event_name not in prices:
-        return {"error": "Invalid event"}
+        if response.status_code != 200:
+            return {
+                "error": f"Backend error: {response.status_code}"
+            }
 
-    booking_id = str(uuid4())
-    total = prices[event_name] * persons
+        data = response.json()
 
-    payment_link = f"https://rzp.io/l/YOUR_PAYMENT_LINK?booking_id={booking_id}"
+        return {
+            "message": "✅ Booking successful!",
+            "booking_details": data
+        }
 
-    return {
-        "booking_id": booking_id,
-        "event": event_name,
-        "persons": persons,
-        "date": date,
-        "time": time,
-        "total": total,
-        "payment_link": payment_link
-    }
+    except Exception as e:
+        return {
+            "error": f"Failed to connect to booking service: {str(e)}"
+        }
 
 
-# Agent (THIS IS WHAT ADK LOOKS FOR)
+# 🤖 ADK Agent (IMPORTANT: root_agent name)
 root_agent = LlmAgent(
-    name="booking_agent",
-    model="gemini-2.0-flash",
-    description="Books tickets for music concerts and tech conferences",
+    name="booking-agent",
+    model="gemini-2.0-flash",  # or switch to OpenAI later
+    description="AI agent to book event tickets via backend API",
     instruction="""
 You are a smart booking assistant.
 
-Collect:
-- event (music concert or tech conference)
-- number of persons
-- date
-- time
+Your job:
+1. Understand user request
+2. Extract:
+   - event_name (music concert or tech conference)
+   - number of persons
+   - date
+   - time
+3. Call the function `book_event`
 
-Then call the tool book_event.
-
-Always respond with booking details and payment link.
+Rules:
+- If user input is incomplete, ask follow-up questions
+- Always confirm booking details
+- Always return the payment link from response
+- Keep responses clear and user-friendly
 """,
     tools=[book_event]
 )
