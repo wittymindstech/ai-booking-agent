@@ -147,4 +147,10 @@ Payment Link Generated
 
 For educational and commercial prototyping use.
 
+## 🤖 Agent UI Preview
+
+Below is how the AI booking agent looks after a successful booking:
+
+![Agent UI](assets/agent-ui.png)
+
 
