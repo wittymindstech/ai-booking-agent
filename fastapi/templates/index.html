@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Event Booking</title>
+  <style>
+    body { font-family: Arial; background: #0f172a; color: white; text-align: center; }
+    .card { background: #1e293b; padding: 20px; margin: 20px auto; width: 300px; border-radius: 10px; }
+    input, select { width: 90%; padding: 8px; margin: 5px; }
+    button { background: #22c55e; padding: 10px 20px; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<h1>🎟️ AI Event Booking System</h1>
+
+{% if message %}
+  <h2>{{ message }}</h2>
+{% endif %}
+
+{% if booking %}
+  <div class="card">
+    <h3>Booking Details</h3>
+    <p>Event: {{ booking.event }}</p>
+    <p>Date: {{ booking.date }}</p>
+    <p>Time: {{ booking.time }}</p>
+    <p>People: {{ booking.persons }}</p>
+    <p>Total: ₹{{ booking.total }}</p>
+  </div>
+{% endif %}
+
+<h2>Available Events</h2>
+
+{% for event in events %}
+<div class="card">
+  <h3>{{ event.name }}</h3>
+  <p>📍 {{ event.location }}</p>
+  <p>💰 ₹{{ event.price }}</p>
+
+  <form method="post" action="/book">
+    <input type="hidden" name="event_id" value="{{ event.id }}">
+
+    <select name="date">
+      {% for d in event.dates %}
+      <option value="{{ d }}">{{ d }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="time">
+      {% for t in event.times %}
+      <option value="{{ t }}">{{ t }}</option>
+      {% endfor %}
+    </select>
+
+    <input type="number" name="persons" placeholder="No. of people" required>
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Email" required>
+
+    <button type="submit">Book Now</button>
+  </form>
+</div>
+{% endfor %}
+
+</body>
+</html>
