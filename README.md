@@ -56,7 +56,12 @@ ai-agent-booking/
 python3.11 -m venv venv
 source venv/bin/activate
 ```
-
+### For Mac Specific
+ ``` bash
+ brew install python@3.11
+ /opt/homebrew/bin/python3.11 -m venv venv
+source venv/bin/activate
+```
 ---
 
 ### 2. Install Dependencies
